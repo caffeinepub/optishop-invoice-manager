@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("/assets/fonts/CabinetGrotesk-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/assets/fonts/Outfit-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Deep Navy Teal + Amber Gold — Optical Shop Palette */
+    --background: 0.97 0.008 220;
+    --foreground: 0.15 0.025 250;
+
+    --card: 1 0 0;
+    --card-foreground: 0.15 0.025 250;
+
+    --popover: 1 0 0;
+    --popover-foreground: 0.15 0.025 250;
+
+    /* Primary: Deep Teal */
+    --primary: 0.32 0.08 215;
+    --primary-foreground: 0.98 0 0;
+
+    /* Secondary: Soft Blue-Gray */
+    --secondary: 0.93 0.018 230;
+    --secondary-foreground: 0.25 0.04 240;
+
+    --muted: 0.94 0.01 220;
+    --muted-foreground: 0.5 0.02 240;
+
+    /* Accent: Amber Gold */
+    --accent: 0.88 0.12 85;
+    --accent-foreground: 0.18 0.04 240;
+
+    --destructive: 0.56 0.22 27;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.88 0.015 230;
+    --input: 0.88 0.015 230;
+    --ring: 0.32 0.08 215;
+
+    /* Chart colors */
+    --chart-1: 0.55 0.18 215;
+    --chart-2: 0.7 0.15 150;
+    --chart-3: 0.75 0.16 85;
+    --chart-4: 0.65 0.2 27;
+    --chart-5: 0.6 0.15 270;
+
+    /* Sidebar */
+    --sidebar: 0.22 0.055 225;
+    --sidebar-foreground: 0.93 0.01 210;
+    --sidebar-primary: 0.72 0.16 85;
+    --sidebar-primary-foreground: 0.18 0.04 240;
+    --sidebar-accent: 0.3 0.065 225;
+    --sidebar-accent-foreground: 0.95 0.01 210;
+    --sidebar-border: 0.3 0.04 230;
+    --sidebar-ring: 0.72 0.16 85;
+
+    /* Custom tokens */
+    --success: 0.62 0.17 145;
+    --success-foreground: 0.98 0 0;
+    --warning: 0.78 0.18 72;
+    --warning-foreground: 0.18 0.04 240;
+  }
+
+  .dark {
+    --background: 0.13 0.03 240;
+    --foreground: 0.96 0.008 220;
+
+    --card: 0.18 0.035 240;
+    --card-foreground: 0.96 0.008 220;
+
+    --popover: 0.2 0.035 240;
+    --popover-foreground: 0.96 0.008 220;
+
+    --primary: 0.72 0.16 85;
+    --primary-foreground: 0.18 0.04 240;
+
+    --secondary: 0.25 0.04 240;
+    --secondary-foreground: 0.9 0.01 220;
+
+    --muted: 0.23 0.03 240;
+    --muted-foreground: 0.65 0.02 230;
+
+    --accent: 0.72 0.16 85;
+    --accent-foreground: 0.18 0.04 240;
+
+    --destructive: 0.65 0.22 27;
+    --destructive-foreground: 0.98 0 0;
+
+    --border: 0.28 0.04 240;
+    --input: 0.28 0.04 240;
+    --ring: 0.72 0.16 85;
+
+    --chart-1: 0.72 0.18 85;
+    --chart-2: 0.65 0.17 155;
+    --chart-3: 0.6 0.2 270;
+    --chart-4: 0.7 0.22 27;
+    --chart-5: 0.55 0.18 215;
+
+    --sidebar: 0.16 0.04 240;
+    --sidebar-foreground: 0.93 0.01 210;
+    --sidebar-primary: 0.72 0.16 85;
+    --sidebar-primary-foreground: 0.18 0.04 240;
+    --sidebar-accent: 0.22 0.04 240;
+    --sidebar-accent-foreground: 0.95 0.01 210;
+    --sidebar-border: 0.25 0.04 240;
+    --sidebar-ring: 0.72 0.16 85;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+.print-only {
+  display: none;
+}

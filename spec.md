@@ -1,31 +1,34 @@
-# Specssify Infusion Invoice Manager
+# OptiShop Invoice Manager
 
 ## Current State
-- App branded as "OptiShop Invoice Manager" throughout the UI, header, invoice print, and footer
-- Four pages: Dashboard, New Order, Invoices, Stock
-- Invoices can be created, viewed, printed, and deleted — but NOT edited
-- Backend stores invoices via `createInvoice` and `deleteInvoice`; no update endpoint exists for invoices
+Full-stack optical shop invoice management app with:
+- Dashboard showing sales summary (today/monthly totals and profit)
+- New Order form with customer info, frame lookup, prescription (left/right eye), GST 5% auto-calculation, auto-incrementing invoice numbers
+- Invoices list with search and print
+- Stock management with frame CRUD and auto-deduction on sale
+- Internet Identity login (optional, required for mutations)
+- Authorization using role-based access control (admin/user/guest)
+
+**Root cause of "Failed to create invoice" error:**
+The backend's `getUserRole` function in `access-control.mo` calls `Runtime.trap("User is not registered")` when an authenticated principal has not yet called `_initializeAccessControlWithSecret`. This causes ALL backend calls to fail for freshly-logged-in users until initialization completes. Additionally there is a race condition: `getAllInvoices` is fetched immediately after actor creation, but initialization may not be complete yet.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Invoice edit functionality: clicking an existing invoice opens an editable form pre-filled with all fields (customer name, mobile, frame number, frame price, lens price, left/right eye prescriptions), allowing the user to save updated data
-- "Edit" button in the invoice row actions alongside Print and Delete
+- Auto-registration: any non-anonymous caller who is not yet in the role map should automatically be assigned `#user` role (no trap, no initialization required)
 
 ### Modify
-- App header: rename "OptiShop" → "Specssify Infusion" with subtitle "PVT. LTD"
-- InvoicePrint.tsx: update print header shop name from "OptiShop" to "Specssify Infusion PVT. LTD"
-- Footer: update copyright text to reference "Specssify Infusion PVT. LTD"
-- Nav brand: update logo text
+- `access-control.mo`: change `getUserRole` to auto-register authenticated-but-unknown callers as `#user` instead of trapping
+- Keep `_initializeAccessControlWithSecret` for admin promotion (first caller with correct token becomes admin)
+- Read-only endpoints (getAllInvoices, getAllFrames, getSalesSummary) should work for any authenticated user without needing prior initialization
+- `createInvoice` should succeed for any logged-in user without requiring prior `_initializeAccessControlWithSecret` call
 
 ### Remove
 - Nothing removed
 
 ## Implementation Plan
-1. Update App.tsx: change brand text "OptiShop" → "Specssify Infusion", subtitle → "PVT. LTD"
-2. Update footer in App.tsx to reference new shop name
-3. Update InvoicePrint.tsx: change all "OptiShop" references to "Specssify Infusion PVT. LTD"
-4. Backend: The existing backend has no `updateInvoice` endpoint. Implement edit by: delete old invoice + create new invoice with same ID (workaround using existing API), or add a frontend-only edit flow that calls deleteInvoice + createInvoice
-5. Add Edit button to invoice row in Invoices.tsx
-6. Add EditInvoiceSheet/Dialog component with pre-filled form fields
-7. Wire edit save flow through existing backend hooks
+1. Regenerate backend with auto-registration logic: in `getUserRole`, when caller is authenticated but not in role map, add them as `#user` and return `#user` (no trap)
+2. Keep all existing data models: Frame, EyePrescription, Invoice, UserProfile
+3. Keep all existing endpoints unchanged
+4. Keep authorization module intact -- admin assignment still works via `_initializeAccessControlWithSecret`
+5. No frontend changes needed once backend is fixed

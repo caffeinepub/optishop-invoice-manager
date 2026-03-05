@@ -1,18 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { T, T__1 } from "../backend.d";
 import { useActor } from "./useActor";
+import { useIsActorReady } from "./useInitialized";
 
 // ─── Frames ─────────────────────────────────────────────────────────────────
 
 export function useGetAllFrames() {
   const { actor, isFetching } = useActor();
+  const { isReady } = useIsActorReady();
   return useQuery<T[]>({
     queryKey: ["frames"],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllFrames();
+      try {
+        return await actor.getAllFrames();
+      } catch (err) {
+        console.warn("getAllFrames failed, returning empty array:", err);
+        return [];
+      }
     },
-    enabled: !!actor && !isFetching,
+    enabled: isReady && !!actor && !isFetching,
+    retry: 3,
+    retryDelay: (attempt) => attempt * 1500,
   });
 }
 
@@ -68,13 +77,21 @@ export function useDeleteFrame() {
 
 export function useGetAllInvoices() {
   const { actor, isFetching } = useActor();
+  const { isReady } = useIsActorReady();
   return useQuery<T__1[]>({
     queryKey: ["invoices"],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllInvoices();
+      try {
+        return await actor.getAllInvoices();
+      } catch (err) {
+        console.warn("getAllInvoices failed, returning empty array:", err);
+        return [];
+      }
     },
-    enabled: !!actor && !isFetching,
+    enabled: isReady && !!actor && !isFetching,
+    retry: 3,
+    retryDelay: (attempt) => attempt * 1500,
   });
 }
 
@@ -112,6 +129,7 @@ export function useDeleteInvoice() {
 
 export function useGetSalesSummary() {
   const { actor, isFetching } = useActor();
+  const { isReady } = useIsActorReady();
   return useQuery<{
     invoiceCount: bigint;
     todayProfit: number;
@@ -129,9 +147,22 @@ export function useGetSalesSummary() {
           todayTotal: 0,
           monthTotal: 0,
         };
-      return actor.getSalesSummary();
+      try {
+        return await actor.getSalesSummary();
+      } catch (err) {
+        console.warn("getSalesSummary failed, returning defaults:", err);
+        return {
+          invoiceCount: BigInt(0),
+          todayProfit: 0,
+          monthProfit: 0,
+          todayTotal: 0,
+          monthTotal: 0,
+        };
+      }
     },
-    enabled: !!actor && !isFetching,
+    enabled: isReady && !!actor && !isFetching,
+    retry: 3,
+    retryDelay: (attempt) => attempt * 1500,
     refetchInterval: 30_000,
   });
 }

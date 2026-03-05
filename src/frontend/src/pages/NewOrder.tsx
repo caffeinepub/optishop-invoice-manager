@@ -288,8 +288,24 @@ export default function NewOrder() {
       setCreatedInvoiceNum(invNum);
       toast.success(`Invoice ${invNum} created successfully!`);
       resetForm();
-    } catch {
-      toast.error("Failed to create invoice. Please try again.");
+    } catch (error) {
+      console.error("Invoice creation error:", error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const isAuthError =
+        errMsg.toLowerCase().includes("not authorized") ||
+        errMsg.toLowerCase().includes("unauthorized") ||
+        errMsg.toLowerCase().includes("anonymous") ||
+        errMsg.toLowerCase().includes("access denied") ||
+        errMsg.toLowerCase().includes("not registered");
+      if (isAuthError) {
+        toast.error(
+          "Authentication error — please log out and log in again, then retry.",
+        );
+      } else {
+        toast.error(
+          "Failed to create invoice. The backend may still be initializing — please wait a moment and try again.",
+        );
+      }
     }
   };
 

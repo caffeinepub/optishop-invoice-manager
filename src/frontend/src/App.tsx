@@ -6,12 +6,18 @@ import {
   FileText,
   Glasses,
   LayoutDashboard,
+  Loader2,
+  LogIn,
+  LogOut,
   Menu,
   Package,
+  User,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
+
+import { useInternetIdentity } from "./hooks/useInternetIdentity";
 
 import Dashboard from "./pages/Dashboard";
 import Invoices from "./pages/Invoices";
@@ -63,6 +69,8 @@ const pageVariants = {
 export default function App() {
   const [activePage, setActivePage] = useState<Page>("dashboard");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { identity, login, clear, isLoggingIn, isInitializing } =
+    useInternetIdentity();
 
   const navigate = (page: Page) => {
     setActivePage(page);
@@ -98,10 +106,10 @@ export default function App() {
             </div>
             <div>
               <span className="font-display font-extrabold text-lg text-sidebar-foreground tracking-tight">
-                OptiShop
+                Specssify Infusion
               </span>
               <span className="hidden sm:block text-[10px] text-sidebar-foreground/50 font-medium -mt-1">
-                Invoice Manager
+                PVT. LTD
               </span>
             </div>
           </div>
@@ -127,20 +135,59 @@ export default function App() {
             ))}
           </nav>
 
-          {/* Mobile Menu Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden text-sidebar-foreground hover:bg-sidebar-accent"
-            onClick={() => setMobileNavOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {mobileNavOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
-          </Button>
+          {/* Auth controls + Mobile Menu Toggle */}
+          <div className="flex items-center gap-2">
+            {/* Login / Logout */}
+            {!isInitializing &&
+              (identity ? (
+                <div className="hidden sm:flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 text-xs text-sidebar-foreground/70 font-medium">
+                    <User className="h-3.5 w-3.5 text-sidebar-primary" />
+                    Logged in
+                  </span>
+                  <Button
+                    data-ocid="auth.logout.button"
+                    variant="outline"
+                    size="sm"
+                    onClick={clear}
+                    className="h-7 text-xs gap-1.5 border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent"
+                  >
+                    <LogOut className="h-3 w-3" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  data-ocid="auth.login.button"
+                  variant="outline"
+                  size="sm"
+                  onClick={login}
+                  disabled={isLoggingIn}
+                  className="hidden sm:flex h-7 text-xs gap-1.5 border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent"
+                >
+                  {isLoggingIn ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <LogIn className="h-3 w-3" />
+                  )}
+                  {isLoggingIn ? "Logging in…" : "Login"}
+                </Button>
+              ))}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden text-sidebar-foreground hover:bg-sidebar-accent"
+              onClick={() => setMobileNavOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              {mobileNavOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Nav Dropdown */}
@@ -171,6 +218,40 @@ export default function App() {
                     {item.label}
                   </button>
                 ))}
+                <div className="pt-2 pb-1 border-t border-sidebar-border mt-2">
+                  {identity ? (
+                    <button
+                      type="button"
+                      data-ocid="auth.logout.button"
+                      onClick={() => {
+                        clear();
+                        setMobileNavOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-150"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      data-ocid="auth.login.button"
+                      onClick={() => {
+                        login();
+                        setMobileNavOpen(false);
+                      }}
+                      disabled={isLoggingIn}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-150 disabled:opacity-50"
+                    >
+                      {isLoggingIn ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogIn className="h-4 w-4" />
+                      )}
+                      {isLoggingIn ? "Logging in…" : "Login"}
+                    </button>
+                  )}
+                </div>
               </nav>
             </motion.div>
           )}

@@ -1,54 +1,31 @@
-# OptiShop Invoice Manager
+# Specssify Infusion Invoice Manager
 
 ## Current State
-New project. No existing code.
+- App branded as "OptiShop Invoice Manager" throughout the UI, header, invoice print, and footer
+- Four pages: Dashboard, New Order, Invoices, Stock
+- Invoices can be created, viewed, printed, and deleted — but NOT edited
+- Backend stores invoices via `createInvoice` and `deleteInvoice`; no update endpoint exists for invoices
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Order / Invoice creation form** with fields:
-  - Customer Name
-  - Mobile Number
-  - Frame Number (stock lookup)
-  - Frame Price
-  - Lens Details: Left Eye (Sphere, Cylinder, Axis, Add) and Right Eye (Sphere, Cylinder, Axis, Add)
-  - Lens Price
-  - GST 5% (auto-calculated)
-  - Grand Total (auto-calculated)
-  - Invoice Number (auto-incremented)
-- **Invoice print view**: printable formatted invoice page
-- **Stock Database**: list of frames with quantity; auto-deduct on order
-- **Sales Dashboard**:
-  - Daily sales total
-  - Monthly sales total
-  - Profit tracking (revenue vs cost)
-- **Invoice list**: searchable list of all saved invoices
-- **Stock management page**: add/edit frames, set cost price and selling price, manage quantity
+- Invoice edit functionality: clicking an existing invoice opens an editable form pre-filled with all fields (customer name, mobile, frame number, frame price, lens price, left/right eye prescriptions), allowing the user to save updated data
+- "Edit" button in the invoice row actions alongside Print and Delete
 
 ### Modify
-- N/A (new project)
+- App header: rename "OptiShop" → "Specssify Infusion" with subtitle "PVT. LTD"
+- InvoicePrint.tsx: update print header shop name from "OptiShop" to "Specssify Infusion PVT. LTD"
+- Footer: update copyright text to reference "Specssify Infusion PVT. LTD"
+- Nav brand: update logo text
 
 ### Remove
-- N/A (new project)
+- Nothing removed
 
 ## Implementation Plan
-
-### Backend (Motoko)
-1. `Frame` type: id, frameNumber, name, brand, costPrice, sellingPrice, quantity
-2. `LensDetail` type: sphere, cylinder, axis, add (for left and right eye)
-3. `Invoice` type: id (auto-increment), invoiceNumber, customerName, mobileNumber, frameId, frameNumber, framePrice, leftEye, rightEye, lensPrice, gst, grandTotal, profit, createdAt
-4. Functions:
-   - `createInvoice(...)` -> auto-increment invoice number, deduct frame stock
-   - `getInvoices()`, `getInvoiceById(id)`
-   - `addFrame(...)`, `updateFrame(...)`, `getFrames()`, `deleteFrame(id)`
-   - `getDailySales(date)` -> total sales for a day
-   - `getMonthlySales(year, month)` -> total sales for a month
-   - `getSalesSummary()` -> daily + monthly totals + profit
-
-### Frontend
-1. **New Order page** - form with all invoice fields, live GST + grand total calculation, submit saves invoice + deducts stock
-2. **Invoice list page** - table of all invoices with search by name/number, print button per invoice
-3. **Invoice print view** - formatted invoice modal/page for browser print
-4. **Stock management page** - table of frames, add/edit/delete with quantity tracking
-5. **Dashboard page** - cards showing today's sales, monthly sales, profit; charts for trends
-6. **Navigation** - sidebar/tabs linking all pages
+1. Update App.tsx: change brand text "OptiShop" → "Specssify Infusion", subtitle → "PVT. LTD"
+2. Update footer in App.tsx to reference new shop name
+3. Update InvoicePrint.tsx: change all "OptiShop" references to "Specssify Infusion PVT. LTD"
+4. Backend: The existing backend has no `updateInvoice` endpoint. Implement edit by: delete old invoice + create new invoice with same ID (workaround using existing API), or add a frontend-only edit flow that calls deleteInvoice + createInvoice
+5. Add Edit button to invoice row in Invoices.tsx
+6. Add EditInvoiceSheet/Dialog component with pre-filled form fields
+7. Wire edit save flow through existing backend hooks

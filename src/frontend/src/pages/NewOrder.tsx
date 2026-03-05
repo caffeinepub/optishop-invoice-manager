@@ -1,6 +1,7 @@
 import {
   CheckCircle2,
   Loader2,
+  LogIn,
   PlusCircle,
   Printer,
   Search,
@@ -18,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import type { T__1 } from "../backend.d";
 import { printInvoice } from "../components/InvoicePrint";
 import { useActor } from "../hooks/useActor";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useCreateInvoice,
   useGetAllFrames,
@@ -119,7 +121,56 @@ function EyeSection({ label, side, values, onChange }: EyeSectionProps) {
   );
 }
 
+function LoginPrompt() {
+  const { login, isLoggingIn } = useInternetIdentity();
+  return (
+    <div className="max-w-md mx-auto mt-16">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Card
+          data-ocid="auth.login_prompt.card"
+          className="border-0 shadow-lg text-center"
+        >
+          <CardContent className="pt-10 pb-10 px-8">
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+              <LogIn className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold font-display text-foreground mb-2">
+              Login Required
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Please log in with Internet Identity to create invoices.
+            </p>
+            <Button
+              data-ocid="auth.login_prompt.button"
+              onClick={login}
+              disabled={isLoggingIn}
+              className="w-full gap-2"
+            >
+              {isLoggingIn ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Logging in…
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  Login with Internet Identity
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function NewOrder() {
+  const { identity } = useInternetIdentity();
   const { data: existingInvoices } = useGetAllInvoices();
   const { data: frames } = useGetAllFrames();
   const { actor } = useActor();
@@ -241,6 +292,10 @@ export default function NewOrder() {
       toast.error("Failed to create invoice. Please try again.");
     }
   };
+
+  if (!identity) {
+    return <LoginPrompt />;
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">

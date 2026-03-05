@@ -25,9 +25,9 @@ export default function InvoicePrint({
       {/* Header */}
       <div className="text-center border-b-2 border-gray-800 pb-4 mb-4">
         <h1 className="text-3xl font-bold tracking-widest text-gray-900 mb-1">
-          OptiShop
+          Specssify Infusion PVT. LTD
         </h1>
-        <p className="text-sm text-gray-600">Optical & Vision Care</p>
+        <p className="text-sm text-gray-600">Optical &amp; Vision Care</p>
         <p className="text-xs text-gray-500 mt-1">
           Quality Eyewear | Expert Eye Care
         </p>
@@ -190,7 +190,7 @@ export default function InvoicePrint({
           Thank you for your visit!
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          OptiShop — Optical & Vision Care
+          Specssify Infusion PVT. LTD — Optical &amp; Vision Care
         </p>
         <p className="text-xs text-gray-400 mt-1">
           This is a computer-generated invoice.
@@ -245,7 +245,7 @@ export function printInvoice(invoice: T__1, invoiceNumber: string) {
 <body>
 <div class="container">
   <div class="header">
-    <h1>OptiShop</h1>
+    <h1>Specssify Infusion PVT. LTD</h1>
     <p>Optical &amp; Vision Care</p>
     <p style="font-size:11px;color:#aaa;margin-top:2px;">Quality Eyewear | Expert Eye Care</p>
   </div>
@@ -326,7 +326,7 @@ export function printInvoice(invoice: T__1, invoiceNumber: string) {
 
   <div class="footer">
     <p>Thank you for your visit!</p>
-    <small>OptiShop — Optical &amp; Vision Care</small>
+    <small>Specssify Infusion PVT. LTD — Optical &amp; Vision Care</small>
     <small>This is a computer-generated invoice.</small>
   </div>
 </div>

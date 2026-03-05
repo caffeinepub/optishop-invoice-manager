@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   Loader2,
+  LogIn,
   Package,
   Pencil,
   Plus,
@@ -46,6 +47,7 @@ import {
 } from "@/components/ui/table";
 
 import type { T } from "../backend.d";
+import { useInternetIdentity } from "../hooks/useInternetIdentity";
 import {
   useAddFrame,
   useDeleteFrame,
@@ -245,7 +247,56 @@ function FrameDialog({ open, onClose, editFrame }: FrameDialogProps) {
   );
 }
 
+function StockLoginPrompt() {
+  const { login, isLoggingIn } = useInternetIdentity();
+  return (
+    <div className="max-w-md mx-auto mt-16">
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Card
+          data-ocid="auth.login_prompt.card"
+          className="border-0 shadow-lg text-center"
+        >
+          <CardContent className="pt-10 pb-10 px-8">
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5">
+              <LogIn className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold font-display text-foreground mb-2">
+              Login Required
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Please log in with Internet Identity to manage stock inventory.
+            </p>
+            <Button
+              data-ocid="auth.login_prompt.button"
+              onClick={login}
+              disabled={isLoggingIn}
+              className="w-full gap-2"
+            >
+              {isLoggingIn ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Logging in…
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  Login with Internet Identity
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Stock() {
+  const { identity } = useInternetIdentity();
   const { data: frames, isLoading } = useGetAllFrames();
   const deleteFrame = useDeleteFrame();
 
@@ -278,6 +329,10 @@ export default function Stock() {
   };
 
   const lowStockCount = (frames ?? []).filter((f) => f.quantity <= 2).length;
+
+  if (!identity) {
+    return <StockLoginPrompt />;
+  }
 
   return (
     <div className="space-y-6">
